@@ -1,0 +1,42 @@
+default_platform(:ios)
+
+platform :ios do
+
+  before_all do
+    cocoapods(try_repo_update_on_error: true)
+  end
+
+  desc "Builds and run unit tests"
+  lane :test do
+    scan(scheme: "BullsEye")
+  end
+
+  desc "Builds and run UI tests"
+  lane :ui_test do
+    scan(scheme: "UITests")
+  end
+
+  desc "Fetch certificates"
+  lane :fetch_certificates do
+    match(
+      type: "appstore",
+      app_identifier: "com.thoughtworks.bullseyee",
+      readonly: true
+    )
+  end
+
+  desc "Release to AppStore"
+  lane :release do
+    fetch_certificates
+
+    increment_build_number({
+      build_number: latest_testflight_build_number + 1
+    })
+
+    testflight(
+      app_identifier: "com.thoughtworks.bullseyee",
+      distribute_external: false,
+      changelog: ""
+    )
+  end
+end
