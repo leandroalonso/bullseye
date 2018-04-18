@@ -29,9 +29,14 @@ platform :ios do
   lane :release do
     fetch_certificates
 
-    increment_build_number({
-      build_number: latest_testflight_build_number + 1
-    })
+    gym(
+      workspace: "BullsEye.xcworkspace",
+      configuration: "Release",
+      scheme: "BullsEye",
+      silent: true,
+      clean: true,
+      sdk: "iphoneos"
+    )
 
     testflight(
       app_identifier: "com.thoughtworks.bullseyee",
